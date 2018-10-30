@@ -13,15 +13,20 @@
  *
  *
  *    // 只截取指定节点
- *    FullPageCaptureWithVideo.capture(document.getElementById('video_chat_container'), function (data) {
+ *    FullPageCaptureWithVideo.capture({
+ *          dom: document.getElementById('video_chat_container'),
+ *          h2cUrl: 'your html2canvas.min.js absolute url here...'
+ *    }, function (data) {
  *       // 新窗口打开图片
  *       window.open().document.write("<img src=" + data + " />");
  *       // 当然，你也可以直接上传保存图片
  *       // Upload(data)
  *   });
  *
+ *
+ * @github https://github.com/zxlie/FullPageCaptureWithVideo
  * @date 2018-10-24 （程序猿节）
- * @author zhaoxianlie
+ * @author zhaoxianlie (阿烈叔)
  */
 var FullPageCaptureWithVideo = (function () {
 
@@ -49,13 +54,20 @@ var FullPageCaptureWithVideo = (function () {
 
     /**
      * 安装 html2canvas.js
+     * @param h2cUrl html2canvas.js的URL地址
+     * @param resolve
      */
-    var installHtml2Canvas = function (resolve) {
+    var installHtml2Canvas = function (h2cUrl,resolve) {
         if (typeof html2canvas === 'undefined') {
             console.log('即将安装 html2canvas ...');
 
+            if(!h2cUrl || !/^http(s)?:\/\/[^\s]+$/.test(h2cUrl)) {
+                h2cUrl = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+                console.log('传入的html2canvas.js地址不合法 或 未指定 ，将采用官方地址替换');
+            }
+
             var script = document.createElement('script');
-            script.setAttribute('src', 'https://html2canvas.hertzen.com/dist/html2canvas.min.js');
+            script.setAttribute('src', h2cUrl);
             document.head.appendChild(script);
 
             var intervalId = window.setInterval(function () {
@@ -72,15 +84,19 @@ var FullPageCaptureWithVideo = (function () {
 
     /**
      * 抓屏，有video标签都自动带上
-     * @param dom
-     * @param resolve
+     * @param options 配置参数
+     * @config dom 需要截取的DOM节点，默认是document.body
+     * @config h2cUrl html2canvas.js的URL地址
+     * @param resolve 抓图回调
      */
-    var capture = function (dom, resolve) {
+    var capture = function (options, resolve) {
+
+        options = options || {};
 
         if (typeof html2canvas === 'function') {
 
             try {
-                dom = dom || document.body;
+                var dom = options.dom || document.body;
                 html2canvas(dom || document.body).then(function (canvas) {
                     console.log('屏幕截取即将开始 ...');
 
@@ -109,8 +125,8 @@ var FullPageCaptureWithVideo = (function () {
                 console.log('sth happened : ', e)
             }
         } else {
-            installHtml2Canvas(function () {
-                capture(dom, resolve);
+            installHtml2Canvas(options.h2cUrl,function () {
+                capture(options, resolve);
             });
         }
     };

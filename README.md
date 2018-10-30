@@ -24,7 +24,23 @@ FullPageCaptureWithVideo.capture(null, function (data) {
 
 ## 示例2：截取某个节点/区域
 ```javascript
-FullPageCaptureWithVideo.capture(document.getElementById('video_chat_container'), function (data) {
+FullPageCaptureWithVideo.capture({
+    dom: document.getElementById('video_chat_container')
+}, function (data) {
+    // 新窗口打开图片
+    window.open().document.write("<img src=" + data + " />");
+    // 当然，你也可以直接上传保存图片
+    // Upload(data)
+});
+```
+
+
+## 示例3：还可以自行指定html2canvas.min.js的地址
+```javascript
+FullPageCaptureWithVideo.capture({
+    // 默认: 'https://html2canvas.hertzen.com/dist/html2canvas.min.js'
+    h2cUrl: 'your html2canvas.min.js absolute url here...' 
+}, function (data) {
     // 新窗口打开图片
     window.open().document.write("<img src=" + data + " />");
     // 当然，你也可以直接上传保存图片
