@@ -47,3 +47,24 @@ FullPageCaptureWithVideo.capture({
     // Upload(data)
 });
 ```
+
+## 示例4：加个水印也是OK的
+```javascript
+// 设置水印
+FullPageCaptureWithVideo.capture({ 
+    waterMark: {
+        text:'抓取于：' + new Date().toLocaleString(),
+        font: "20px Arial",
+        color: '#f00',
+        position: {
+            x: 20,
+            y: 20
+        } 
+    }
+}, function (data) {
+    // 新窗口打开图片
+    window.open().document.write("<img src=" + data + " />");
+    // 当然，你也可以直接上传保存图片
+    // Upload(data)
+});
+```

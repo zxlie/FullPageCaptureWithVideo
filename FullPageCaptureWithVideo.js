@@ -23,6 +23,22 @@
  *       // Upload(data)
  *   });
  *
+ *   // 设置水印
+ *   FullPageCaptureWithVideo.capture({ waterMark: {
+        text:'抓取于：' + new Date().toLocaleString(),
+        font: "20px Arial",
+        color: '#f00',
+        position: {
+            x: 20,
+            y: 20
+        } }
+    }, function (data) {
+       // 新窗口打开图片
+        window.open().document.write("<img src=" + data + " />");
+        // 当然，你也可以直接上传保存图片
+        // Upload(data)
+    });
+ *
  *
  * @github https://github.com/zxlie/FullPageCaptureWithVideo
  * @date 2018-10-24 （程序猿节）
@@ -82,11 +98,37 @@ var FullPageCaptureWithVideo = (function () {
         }
     };
 
+
+    /**
+     * 给canvas打上水印
+     * @param canvas
+     * @param options
+     *  @config text 需要水印的文字
+     *  @config font 字体设置
+     *  @config color 水印颜色
+     *  @config position 位置{x,y}
+     * @returns {*}
+     */
+    var waterMark = function(canvas,options){
+        var ctx = canvas.getContext("2d");
+
+        ctx.font = options.font || "12px";
+        ctx.fillStyle = options.color || "rgba(255,0,0,0.8)";
+        ctx.fillText(options.text, options.position && options.position.x || 10,  options.position && options.position.y || 10);
+
+        return canvas;
+    };
+
     /**
      * 抓屏，有video标签都自动带上
      * @param options 配置参数
-     * @config dom 需要截取的DOM节点，默认是document.body
-     * @config h2cUrl html2canvas.js的URL地址
+     *  @config dom 需要截取的DOM节点，默认是document.body
+     *  @config h2cUrl html2canvas.js的URL地址
+     *  @config waterMark 水印
+     *      @c-config text 需要水印的文字
+     *      @c-config font 字体设置
+     *      @c-config color 水印颜色
+     *      @c-config position 位置{x,y}
      * @param resolve 抓图回调
      */
     var capture = function (options, resolve) {
@@ -100,7 +142,8 @@ var FullPageCaptureWithVideo = (function () {
                 html2canvas(dom || document.body, {
                     useCORS : true,
                     foreignObjectRendering : true,
-                    allowTaint :false
+                    allowTaint :true,
+                    logging:false
                 }).then(function (canvas) {
                     console.log('屏幕截取即将开始 ...');
 
@@ -116,11 +159,17 @@ var FullPageCaptureWithVideo = (function () {
 
                             if (index === videos.length - 1) {
                                 console.log('屏幕截取成功！');
+                                if(options.waterMark) {
+                                    canvas = waterMark(canvas,options.waterMark);
+                                }
                                 resolve && resolve(canvas.toDataURL('image/png'));
                             }
                         });
                     } else {
                         console.log('屏幕截取成功！');
+                        if(options.waterMark) {
+                            canvas = waterMark(canvas,options.waterMark);
+                        }
                         resolve && resolve(canvas.toDataURL('image/png'));
                     }
 
