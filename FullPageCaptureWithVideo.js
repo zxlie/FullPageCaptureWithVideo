@@ -97,7 +97,11 @@ var FullPageCaptureWithVideo = (function () {
 
             try {
                 var dom = options.dom || document.body;
-                html2canvas(dom || document.body).then(function (canvas) {
+                html2canvas(dom || document.body, {
+                    useCORS : true,
+                    foreignObjectRendering : true,
+                    allowTaint :false
+                }).then(function (canvas) {
                     console.log('屏幕截取即将开始 ...');
 
                     // 将 视频区域还原回去
